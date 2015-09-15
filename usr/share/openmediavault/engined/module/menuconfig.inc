@@ -26,14 +26,14 @@
  *
  */
 require_once("openmediavault/module.inc");
-#require_once("openmediavault/config.inc");
+require_once("openmediavault/config.inc");
 require_once("openmediavault/error.inc");
-#require_once("openmediavault/util.inc");
+require_once("openmediavault/util.inc");
 #require_once("openmediavault/initscript.inc");
 #require_once("openmediavault/log.inc");
 
 class OMVModuleMenuconfig extends OMVModuleServiceAbstract
-    implements OMVINotifyListener, OMVIModuleServiceStatus {
+    implements OMVINotifyListener {
 
     /**
      * Get the module name.
