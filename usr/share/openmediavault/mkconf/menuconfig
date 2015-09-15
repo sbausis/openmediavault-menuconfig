@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# @license   http://www.gnu.org/licenses/gpl.html GPL Version 3
+# @author    Ian Moore <imooreyahoo@gmail.com>
+# @author    Simon Baur <sbausis@gmx.net>
+# @copyright Copyright (c) 2011 Ian Moore
+# @copyright Copyright (c) 2015 Simon Baur
+#
+# This file is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# This file is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this file. If not, see <http://www.gnu.org/licenses/>.
+
+set -e
+
+. /etc/default/openmediavault
+. /usr/share/openmediavault/scripts/helper-functions
+
+
+DEFAULTS="/etc/default/menuconfig"
+CONFIG="/etc/dnsmasq.d/omv.conf"
+
+# Enable/disable service
+if [ "$(omv_config_get "//services/menuconfig/enable")" != "1" ]; then
+	exit 0
+fi
+
+# Entries
+#index=$(omv_config_get_count "//services/dnsmasq/entries/entry")
+#while [ ${index} -gt 0 ]
+#do
+#
+#done

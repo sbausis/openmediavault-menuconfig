@@ -1,0 +1,13 @@
+Source: openmediavault-menuconfig
+Section: net
+XB-Plugin-Section: network
+Priority: optional
+Maintainer: Simon Baur <sbausis@gmx.net>
+Build-Depends: debhelper (>= 9.0.0 )
+Standards-Version: 3.9.6
+Homepage: http://omv-extras.org/
+
+Package: openmediavault-menuconfig
+Architecture: all
+Depends: ${misc:Depends}, openmediavault (>= 2.1)
+Description: OpenMediaVault MenuConfig
