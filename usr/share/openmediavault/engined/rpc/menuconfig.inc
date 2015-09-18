@@ -47,7 +47,8 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
     public function initialize() {
         $this->registerMethod("getSettings");
         $this->registerMethod("setSettings");
-        $this->registerMethod("getEntries");
+		$this->registerMethod("getList");
+        //$this->registerMethod("getEntries");
     }
 
     /**
@@ -110,9 +111,6 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
         $object = array(
             "enable"             => array_boolval($params, 'enable')
         );
-
-        // DHCP isn't enabled if dnsmasq isn't enabled
-        //$object['dhcp-enable'] = ($object['enable'] && $object['dhcp-enable']);
 
         if(FALSE === $xmlConfig->replace("//services/menuconfig", $object))
             throw new OMVException(OMVErrorMsg::E_CONFIG_SET_OBJECT_FAILED);
