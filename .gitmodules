@@ -1,0 +1,4 @@
+[submodule "usr/local/sbin"]
+	path = usr/local/sbin
+	url = https://github.com/sbausis/omv-menunodes.git
+	branch = master
