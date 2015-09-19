@@ -30,19 +30,23 @@ case "$1" in
 
         # Check for XML config
         if ! omv_config_exists "${SERVICE_XPATH}"; then
-            omv_config_add_element "/config/services" "${SERVICE_XPATH_NAME}" ""
+			omv_config_add_element "/config/services" "${SERVICE_XPATH_NAME}" ""
         fi
 
         if ! omv_config_exists "${SERVICE_XPATH}/enable"; then
-                omv_config_add_element "${SERVICE_XPATH}" "enable" "0"
+			omv_config_add_element "${SERVICE_XPATH}" "enable" "0"
         fi
 
         if ! omv_config_exists "${SERVICE_XPATH}/entries"; then
-                omv_config_add_element "${SERVICE_XPATH}" "entries" ""
+			omv_config_add_element "${SERVICE_XPATH}" "entries" ""
         fi
 
         chown root /usr/local/sbin/omv-menunodes
         chmod 0700 /usr/local/sbin/omv-menunodes
+
+		/usr/local/sbin/omv-menunodes -s admin -c
+		/usr/local/sbin/omv-menunodes -s user -c
+		/usr/local/sbin/omv-menunodes -s public -c
 
         chown root /usr/sbin/omv_menuconfig
         chmod 0700 /usr/sbin/omv_menuconfig
