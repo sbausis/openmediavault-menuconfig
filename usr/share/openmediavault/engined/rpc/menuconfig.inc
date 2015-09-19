@@ -150,12 +150,20 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
             }
         }');
 
-        // Get the configuration object.
-        $xpath = "//services/menuconfig/entries/entry";
-        $objects = $xmlConfig->getList($xpath);
-        if(is_null($objects))
-            throw new OMVException(OMVErrorMsg::E_CONFIG_GET_OBJECT_FAILED, $xpath);
-
+		$command = "/usr/local/sbin/omv-menunodes -s admin -j -l";
+        if(0 !== $this->exec($command, $output))
+            throw new OMVException(OMVErrorMsg::E_EXEC_FAILED, $command, implode("\n", $output));
+		
+		$node_list = json_decode($output, true);
+		if ($node_list === NULL) {
+			throw new OMVException(OMVErrorMsg::E_EXEC_FAILED, $node_list, implode("\n", $output));
+		}
+		
+		$objects = array();
+		for ($i = 0; $i < count($node_list); $i++) {
+			array_push($objects, array("id" => $node_list[$i]["id"], "path" => $node_list[$i]["path"], ));
+		}
+		
         // Filter the result.
         return $this->applyFilter($objects, $params['start'],
             $params['limit'], $params['sortfield'], $params['sortdir']);
