@@ -75,7 +75,7 @@ Ext.define("OMV.module.admin.service.menuconfig.Entries", {
                     type    : "rpc",
                     rpcData : {
                         service : "Menuconfig",
-                        method  : "getEntries"
+                        method  : "getList"
                     }
                 }
             })

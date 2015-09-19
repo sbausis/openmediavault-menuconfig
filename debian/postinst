@@ -1,9 +1,7 @@
 #!/bin/sh
 #
 # @license   http://www.gnu.org/licenses/gpl.html GPL Version 3
-# @author    Marcel Beck <marcel.beck@mbeck.org>
 # @author    Simon Baur <sbausis@gmx.net>
-# @copyright Copyright (c) 2012 Marcel Beck
 # @copyright Copyright (c) 2015 Simon Baur
 #
 # This program is free software: you can redistribute it and/or modify
@@ -43,20 +41,13 @@ case "$1" in
                 omv_config_add_element "${SERVICE_XPATH}" "entries" ""
         fi
 
-        # Reload rsyslogd so that it sees the new config file
-        #/etc/init.d/rsyslog restart
+        chown root /usr/local/sbin/omv-menunodes
+        chmod 0700 /usr/local/sbin/omv-menunodes
 
         chown root /usr/sbin/omv_menuconfig
         chmod 0700 /usr/sbin/omv_menuconfig
 
-        # Backup dnsmasq config
-        #if [ ! -e /etc/default/dnsmasq-orig ]; then
-        #    /bin/cp /etc/default/dnsmasq /etc/default/dnsmasq-orig
-        #fi
-
-        # Run config and restart dnsmasq
         omv-mkconf menuconfig 2>/dev/null
-        #/etc/init.d/dnsmasq restart || true
 
         dpkg-trigger update-fixperms
         dpkg-trigger update-locale

@@ -49,17 +49,6 @@ class OMVModuleMenuconfig extends OMVModuleServiceAbstract
         if(0 !== $this->exec($cmd, $output))
             throw new OMVException(OMVErrorMsg::E_EXEC_FAILED, $cmd, implode("\n", $output));
 
-        // Restart samba enabling dnsmasq or enabling dns-wins - not sure how
-        //$xpath = "//services/dnsmasq";
-        //$object = $xmlConfig->get($xpath);
-        //if(is_null($object))
-        //    throw new OMVException(OMVErrorMsg::E_CONFIG_GET_OBJECT_FAILED, $xpath);
-        //
-        //if(FALSE === boolval($object['enable']))
-        //    return;
-        //
-        //$initd = new OMVSysVInitScript("dnsmasq", TRUE);
-        //$initd->restart();
     }
 
     /**

@@ -1,9 +1,7 @@
 #!/bin/sh
 #
 # @license   http://www.gnu.org/licenses/gpl.html GPL Version 3
-# @author    Marcel Beck <marcel.beck@mbeck.org>
 # @author    Simon Baur <sbausis@gmx.net>
-# @copyright Copyright (c) 2012 Marcel Beck
 # @copyright Copyright (c) 2015 Simon Baur
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,8 +24,30 @@ set -e
 
 if [ "$1" = "purge" ]; then
 
-    if [ -e /var/cache/cached-nodes.list ]; then
-        /bin/rm /var/cache/cached-nodes.list
+    if [ -f /var/cache/cached_admin_nodes.list ]; then
+        /bin/rm /var/cache/cached_admin_nodes.list
+    fi
+
+    if [ -f /var/cache/cached_admin_panels.list ]; then
+        /bin/rm /var/cache/cached_admin_panels.list
+    fi
+
+
+    if [ -f /var/cache/cached_user_nodes.list ]; then
+        /bin/rm /var/cache/cached_user_nodes.list
+    fi
+
+    if [ -f /var/cache/cached_user_panels.list ]; then
+        /bin/rm /var/cache/cached_user_panels.list
+    fi
+
+
+    if [ -f /var/cache/cached_public_nodes.list ]; then
+        /bin/rm /var/cache/cached_public_nodes.list
+    fi
+
+    if [ -f /var/cache/cached_public_panels.list ]; then
+        /bin/rm /var/cache/cached_public_panels.list
     fi
 
 fi

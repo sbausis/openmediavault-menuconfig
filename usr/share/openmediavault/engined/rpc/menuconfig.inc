@@ -48,7 +48,6 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
         $this->registerMethod("getSettings");
         $this->registerMethod("setSettings");
 		$this->registerMethod("getList");
-        //$this->registerMethod("getEntries");
     }
 
     /**
@@ -134,7 +133,7 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
      *
      * @return array list of Entries
      */
-    public function getEntries($params, $context) {
+    public function getList($params, $context) {
         global $xmlConfig;
 
         // Validate the RPC caller context.
