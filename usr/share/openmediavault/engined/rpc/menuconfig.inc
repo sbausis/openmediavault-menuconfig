@@ -151,13 +151,14 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
         }');
 
 		$command = "/usr/local/sbin/omv-menunodes -s admin -j -l";
-        if(0 !== $this->exec($command, $output))
+		$output = system($command, $ret);
+        if(0 !== $ret)
             throw new OMVException(OMVErrorMsg::E_EXEC_FAILED, $command, implode("\n", $output));
 		
 		$node_list = json_decode($output, true);
-		//if ($node_list === NULL) {
-		//	throw new OMVException(OMVErrorMsg::E_MISC_FAILURE, $node_list, implode("\n", $output));
-		//}
+		if ($node_list == NULL) {
+			throw new OMVException(OMVErrorMsg::E_MISC_FAILURE, $node_list, implode("\n", $output));
+		}
 		
 		$objects = array();
 		for ($i = 0; $i < count($node_list); $i++) {
