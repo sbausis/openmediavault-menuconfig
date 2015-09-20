@@ -155,9 +155,9 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
             throw new OMVException(OMVErrorMsg::E_EXEC_FAILED, $command, implode("\n", $output));
 		
 		$node_list = json_decode($output, true);
-		if ($node_list === NULL) {
-			throw new OMVException(OMVErrorMsg::E_EXEC_FAILED, $node_list, implode("\n", $output));
-		}
+		//if ($node_list === NULL) {
+		//	throw new OMVException(OMVErrorMsg::E_MISC_FAILURE, $node_list, implode("\n", $output));
+		//}
 		
 		$objects = array();
 		for ($i = 0; $i < count($node_list); $i++) {
