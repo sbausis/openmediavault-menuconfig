@@ -48,6 +48,9 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
         $this->registerMethod("getSettings");
         $this->registerMethod("setSettings");
 		$this->registerMethod("getList");
+		$this->registerMethod("getNodes");
+		$this->registerMethod("setNodes");
+		$this->registerMethod("get");
     }
 
     /**
@@ -108,7 +111,8 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
 
         // Update the configuration object.
         $object = array(
-            "enable"             => array_boolval($params, 'enable')
+            "enable" 	=> array_boolval($params, 'enable'),
+            "entries" 	=> isset($oldObject['entries']) ? $oldObject['entries'] : array()
         );
 
         if(FALSE === $xmlConfig->replace("//services/menuconfig", $object))
@@ -116,8 +120,7 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
 
         // Notify configuration changes.
         $dispatcher = &OMVNotifyDispatcher::getInstance();
-        $dispatcher->notify(OMV_NOTIFY_MODIFY,
-            "org.openmediavault.services.menuconfig", $object);
+        $dispatcher->notify(OMV_NOTIFY_MODIFY, "org.openmediavault.services.menuconfig", $object);
 
         // Return the configuration object.
         return $object;
@@ -169,7 +172,142 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
         return $this->applyFilter($objects, $params['start'],
             $params['limit'], $params['sortfield'], $params['sortdir']);
     }
+	
+	public function read_nodes($force) {
+		$command = "/usr/local/sbin/omv-menunodes -s admin -j -l";
+		if ($force == true) $command = " -c";
+		
+		$output = system($command, $ret);
+        if(0 !== $ret)
+            throw new OMVException(OMVErrorMsg::E_EXEC_FAILED, $command, implode("\n", $output));
+		
+		$node_list = json_decode($output, true);
+		if ($node_list == NULL) {
+			throw new OMVException(OMVErrorMsg::E_MISC_FAILURE, $node_list, implode("\n", $output));
+		}
+		
+		$objects = array();
+		for ($i = 0; $i < count($node_list); $i++) {
+			array_push($objects, array("id" => $node_list[$i]["id"], "path" => $node_list[$i]["path"], ));
+		}
+		return $objects;
+	}
+	
+	public function getNodes($params, $context) {
+        global $xmlConfig;
 
+        // Validate the RPC caller context.
+        $this->validateMethodContext($context, array( "role" => OMV_ROLE_ADMINISTRATOR ));
+
+        // Validate the parameters of the RPC service method.
+        $this->validateMethodParams($params, '{
+            "type"       : "object",
+            "properties" : {
+                "start"     : { "type" : "integer" },
+                "limit"     : { '.$GLOBALS['OMV_JSONSCHEMA_COUNTFIELD'].' },
+                "sortfield" : { '.$GLOBALS['OMV_JSONSCHEMA_SORTFIELD'].' },
+                "sortdir"   : { '.$GLOBALS['OMV_JSONSCHEMA_SORTDIR'].' }
+            }
+        }');
+		
+		$objects = $this->read_nodes(true)
+		
+        // Filter the result.
+        return $this->applyFilter($objects, $params['start'],
+            $params['limit'], $params['sortfield'], $params['sortdir']);
+    }
+	
+	public function setNodes($params, $context) {
+		global $xmlConfig;
+		// Validate the RPC caller context.
+		$this->validateMethodContext($context, array(
+			  "role" => OMV_ROLE_ADMINISTRATOR
+		  ));
+		// Validate the parameters of the RPC service method.
+		$this->validateMethodParams($params, '{
+			  "type":"array",
+			  "items":{
+				  "type":"object",
+				  "properties":{
+					  "id":{"type":"string"},
+					  "enable":{"type":"boolean"}
+				  }
+			  }
+		  }');
+		// Prepare the configuration object.
+		$object = array();
+		// Get the list of registered modules.
+		$moduleMgr = &OMVModuleMgr::getInstance();
+		$modules = $moduleMgr->getModules();
+		foreach($modules as $modulev) {
+			// Check if the module implements the OMVIModuleNotification
+			// interface.
+			if($modulev instanceof OMVIModuleNotification) {
+				$config = $modulev->getNotificationConfig();
+				foreach($config as $configk => $configv) {
+					$enable = FALSE; // Default value.
+					foreach($params as $paramk => $paramv) {
+						if($paramv['id'] === $configv['id']) {
+							$enable = array_boolval($paramv, 'enable');
+							break;
+						}
+					}
+					$object[$configv['id']] = $enable;
+				}
+			}
+		}
+		// Set the configuration object.
+		$xpath = "//system/notification/notifications";
+		if(FALSE === $xmlConfig->replace($xpath, $object)) {
+			throw new OMVException(OMVErrorMsg::E_CONFIG_SET_OBJECT_FAILED);
+		}
+		// Notify the configuration changes.
+		$dispatcher = &OMVNotifyDispatcher::getInstance();
+		$dispatcher->notify(OMV_NOTIFY_MODIFY,
+		  "org.openmediavault.system.notification.notifications", $object);
+		// Return the configuration object.
+		return $object;
+	}
+
+	public function get($params, $context) {
+		global $xmlConfig;
+		// Validate the RPC caller context.
+		$this->validateMethodContext($context, array(
+			  "role" => OMV_ROLE_ADMINISTRATOR
+		  ));
+		$result = array();
+		// Get the configuration object.
+		$xpath = "//system/notification/notifications";
+		$object = $xmlConfig->get($xpath);
+		if(is_null($object)) {
+			throw new OMVException(OMVErrorMsg::E_CONFIG_GET_OBJECT_FAILED,
+			  $xpath);
+		}
+		// Get the list of registered modules.
+		$moduleMgr = &OMVModuleMgr::getInstance();
+		$modules = $moduleMgr->getModules();
+		foreach($modules as $modulev) {
+			// Check if the module implements the OMVIModuleNotification
+			// interface.
+			if($modulev instanceof OMVIModuleNotification) {
+				$config = $modulev->getNotificationConfig();
+				foreach($config as $configk => $configv) {
+					$enable = FALSE; // Default value.
+					if(array_key_exists($configv['id'], $object)) {
+						$enable = boolvalEx($object[$configv['id']]);
+					}
+					$result[] = array(
+						  "id" => $configv['id'],
+						  "type" => $configv['type'],
+						  "title" => $configv['title'],
+						  "enable" => $enable
+					  );
+				}
+			}
+		}
+		return $result;
+	}
+	
 }
 
 // Register the RPC service.
