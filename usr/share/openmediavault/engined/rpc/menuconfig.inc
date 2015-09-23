@@ -69,8 +69,8 @@ class OMVMenuconfigJson {
 			$enable = true;
 			array_push($objects, 
 				array(	"id" 		=> $json_data[$i]["id"], 
-						"path" 		=> stripslashes($json_data[$i]["path"]),
-						"fullpath" 	=> stripslashes($fullpath),
+						"path" 		=> $json_data[$i]["path"],
+						"fullpath" 	=> $fullpath,
 						"enable" 	=> boolval($enable),
 			));
 		}
@@ -274,8 +274,8 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
 		$objects = $json_handler->get_nodes(false);
 		return $objects;
         // Filter the result.
-        return $this->applyFilter($objects, $params['start'],
-            $params['limit'], $params['sortfield'], $params['sortdir']);
+        //return $this->applyFilter($objects, $params['start'],
+        //    $params['limit'], $params['sortfield'], $params['sortdir']);
     }
 	
 	public function setNodes($params, $context) {
