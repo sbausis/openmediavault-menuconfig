@@ -32,6 +32,56 @@ require_once("openmediavault/util.inc");
 require_once("openmediavault/rpcservice.inc");
 require_once("openmediavault/notify.inc");
 
+class OMVMenuconfigJson {
+	public $json_script = '/usr/local/sbin/omv-menunodes';
+	public $json_user = 'admin';
+	public $json_file = '/var/cache/openmediavault/nodes.json';
+	public function recache_nodes() {
+		$cmd_recache = $this->json_script . " -s " . $this->json_user . " -c -j -l > " . $this->json_file;
+		$output = system($cmd_recache, $ret);
+		if ($ret !== 0) {
+			throw new OMVException("failed to recache Nodes ...");
+		}
+	}
+	public $json_string = NULL;
+	public function load_nodes($force = FALSE) {
+		if (!file_exists($this->json_file) || $force === TRUE) {
+			$this->recache_nodes();
+		}
+		$json_string = file_get_contents($this->json_file);
+		if($json_string === FALSE) {
+			throw new OMVException("failed to open Nodes : " . $this->json_file . " ...");
+		}
+		$this->json_string = $json_string;
+		return $json_string;
+	}
+	public $json_object = NULL;
+	public function decode_nodes($json_string) {
+		$json_data = json_decode($json_string, true);
+		if($json_data === NULL) {
+			throw new RuntimeException("failed to decode JSON Data : " . $this->json_file . " ...");
+		}
+		$objects = array();
+		for ($i = 0; $i < count($json_data); $i++) {
+			$fullpath = (strlen($json_data[$i]["path"])>1)
+				?$json_data[$i]["path"]."/".$json_data[$i]["id"]
+				:$json_data[$i]["path"].$json_data[$i]["id"];
+			$enable = true;
+			array_push($objects, 
+				array(	"id" 		=> $json_data[$i]["id"], 
+						"path" 		=> stripslashes($json_data[$i]["path"]),
+						"fullpath" 	=> stripslashes($fullpath),
+						"enable" 	=> boolval($enable),
+			));
+		}
+		$this->json_object = $json_data;
+		return $objects;
+	}
+	public function get_nodes($recache = FALSE) {
+		return $this->decode_nodes($this->load_nodes($recache));
+	}
+}
+
 class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
 
     /**
@@ -159,8 +209,8 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
             throw new OMVException(OMVErrorMsg::E_EXEC_FAILED, $command, implode("\n", $output));
 		
 		$node_list = json_decode($output, true);
-		if ($node_list == NULL) {
-			throw new OMVException(OMVErrorMsg::E_MISC_FAILURE, $node_list, implode("\n", $output));
+		if ($node_list === NULL) {
+			throw new OMVException(OMVErrorMsg::E_MISC_FAILURE, $node_list, json_last_error_msg());
 		}
 		
 		$objects = array();
@@ -172,10 +222,14 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
         return $this->applyFilter($objects, $params['start'],
             $params['limit'], $params['sortfield'], $params['sortdir']);
     }
-	
+
+	/**
+     * Get list of Entries
+     *
+     */
 	public function read_nodes($force) {
 		$command = "/usr/local/sbin/omv-menunodes -s admin -j -l";
-		if ($force == true) $command = " -c";
+		if ($force == true) $command .= " -c";
 		
 		$output = system($command, $ret);
         if(0 !== $ret)
@@ -193,6 +247,12 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
 		return $objects;
 	}
 	
+	
+	
+	/**
+     * Get list of Entries
+     *
+     */
 	public function getNodes($params, $context) {
         global $xmlConfig;
 
@@ -200,18 +260,19 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
         $this->validateMethodContext($context, array( "role" => OMV_ROLE_ADMINISTRATOR ));
 
         // Validate the parameters of the RPC service method.
-        $this->validateMethodParams($params, '{
-            "type"       : "object",
-            "properties" : {
-                "start"     : { "type" : "integer" },
-                "limit"     : { '.$GLOBALS['OMV_JSONSCHEMA_COUNTFIELD'].' },
-                "sortfield" : { '.$GLOBALS['OMV_JSONSCHEMA_SORTFIELD'].' },
-                "sortdir"   : { '.$GLOBALS['OMV_JSONSCHEMA_SORTDIR'].' }
-            }
-        }');
+        //$this->validateMethodParams($params, '{
+        //    "type"       : "object",
+        //    "properties" : {
+        //        "start"     : { "type" : "integer" },
+        //        "limit"     : { '.$GLOBALS['OMV_JSONSCHEMA_COUNTFIELD'].' },
+        //        "sortfield" : { '.$GLOBALS['OMV_JSONSCHEMA_SORTFIELD'].' },
+        //        "sortdir"   : { '.$GLOBALS['OMV_JSONSCHEMA_SORTDIR'].' }
+        //    }
+        //}');
 		
-		$objects = $this->read_nodes(true)
-		
+		$json_handler = new OMVMenuconfigJson();
+		$objects = $json_handler->get_nodes(false);
+		return $objects;
         // Filter the result.
         return $this->applyFilter($objects, $params['start'],
             $params['limit'], $params['sortfield'], $params['sortdir']);

@@ -75,7 +75,7 @@ Ext.define("OMV.module.admin.service.menuconfig.Entries", {
                     type    : "rpc",
                     rpcData : {
                         service : "Menuconfig",
-                        method  : "getList"
+                        method  : "getNodes"
                     }
                 }
             })
@@ -84,10 +84,10 @@ Ext.define("OMV.module.admin.service.menuconfig.Entries", {
     }
 });
 
-OMV.WorkspaceManager.registerPanel({
-    id        : "entries",
-    path      : "/service/menuconfig",
-    text      : _("Entries"),
-    position  : 30,
-    className : "OMV.module.admin.service.menuconfig.Entries"
-});
+//OMV.WorkspaceManager.registerPanel({
+//    id        : "entries",
+//    path      : "/service/menuconfig",
+//    text      : _("Entries"),
+//    position  : 30,
+//    className : "OMV.module.admin.service.menuconfig.Entries"
+//});
