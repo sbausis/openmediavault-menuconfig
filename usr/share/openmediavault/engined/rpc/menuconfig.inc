@@ -35,7 +35,7 @@ require_once("openmediavault/notify.inc");
 class OMVMenuconfigJson {
 	public $json_script = '/usr/local/sbin/omv-menunodes';
 	public $json_user = 'admin';
-	public $json_file = '/var/cache/openmediavault/nodes.json';
+	public $json_file = '/var/cache/openmediavault/nodes_admin.json';
 	public function recache_nodes() {
 		$cmd_recache = $this->json_script . " -s " . $this->json_user . " -c -j -l > " . $this->json_file;
 		$output = system($cmd_recache, $ret);
@@ -79,6 +79,69 @@ class OMVMenuconfigJson {
 	}
 	public function get_nodes($recache = FALSE) {
 		return $this->decode_nodes($this->load_nodes($recache));
+	}
+	
+	public $overrides_file = '/var/cache/openmediavault/overrides_admin.json';
+	public function recache_overrides() {
+		$cmd_recache = $this->json_script . " -s " . $this->json_user . " -c -j -L > " . $this->overrides_file;
+		$output = system($cmd_recache, $ret);
+		if ($ret !== 0) {
+			throw new OMVException("failed to recache Overrides ...");
+		}
+	}
+	public $overrides_string = NULL;
+	public function load_overrides($force = FALSE) {
+		if (!file_exists($this->overrides_file) || $force === TRUE) {
+			$this->recache_overrides();
+		}
+		$overrides_string = file_get_contents($this->overrides_file);
+		if($overrides_string === FALSE) {
+			throw new OMVException("failed to open Overrides : " . $this->overrides_file . " ...");
+		}
+		$this->overrides_string = $overrides_string;
+		return $overrides_string;
+	}
+	public $overrides_object = NULL;
+	public function decode_nodes($overrides_string) {
+		$json_data = json_decode($overrides_string, true);
+		if($json_data === NULL) {
+			throw new RuntimeException("failed to decode JSON Data : " . $this->overrides_file . " ...");
+		}
+		$objects = array();
+		for ($i = 0; $i < count($json_data); $i++) {
+			$fullpath = (strlen($json_data[$i]["path"])>1)
+				?$json_data[$i]["path"]."/".$json_data[$i]["id"]
+				:$json_data[$i]["path"].$json_data[$i]["id"];
+			$enable = true;
+			array_push($objects, 
+				array(	"id" 		=> $json_data[$i]["id"], 
+						"path" 		=> $json_data[$i]["path"],
+						"fullpath" 	=> $fullpath,
+						"enable" 	=> boolval($enable),
+			));
+		}
+		$this->overrides_object = $json_data;
+		return $objects;
+	}
+	public function get_overrides($recache = FALSE) {
+		return $this->decode_overrides($this->load_overrides($recache));
+	}
+	
+	public function get_list($recache = FALSE) {
+		$nodes = $this->decode_nodes($this->load_nodes($recache));
+		$overrides = $this->decode_overrides($this->load_overrides($recache));
+		$objects = array();
+		for ($i = 0; $i < count($nodes); $i++) {
+			$node = $nodes[$i];
+			for ($u = 0; $u < count($overrides); $u++) {
+				if ($nodes[$i]["path"]==$overrides[$u]["path"] && $nodes[$i]["id"]==$overrides[$u]["id"]) {
+					$node = $overrides[$u];
+					break;
+				}
+			}
+			array_push($objects, $node);
+		}
+		return $objects;
 	}
 }
 
@@ -271,7 +334,9 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
         //}');
 		
 		$json_handler = new OMVMenuconfigJson();
-		$objects = $json_handler->get_nodes(false);
+		//$objects = $json_handler->get_nodes(false);
+		//$objects = $json_handler->get_overrides(false);
+		$objects = $json_handler->get_list(false);
 		return $objects;
         // Filter the result.
         //return $this->applyFilter($objects, $params['start'],
