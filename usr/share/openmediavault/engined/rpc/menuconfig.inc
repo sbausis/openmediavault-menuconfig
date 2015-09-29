@@ -102,7 +102,7 @@ class OMVMenuconfigJson {
 		return $overrides_string;
 	}
 	public $overrides_object = NULL;
-	public function decode_nodes($overrides_string) {
+	public function decode_overrides($overrides_string) {
 		$json_data = json_decode($overrides_string, true);
 		if($json_data === NULL) {
 			throw new RuntimeException("failed to decode JSON Data : " . $this->overrides_file . " ...");
