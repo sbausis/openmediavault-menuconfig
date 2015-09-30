@@ -135,7 +135,15 @@ class OMVMenuconfigJson {
 			$node = $nodes[$i];
 			for ($u = 0; $u < count($overrides); $u++) {
 				if ($nodes[$i]["path"]==$overrides[$u]["path"] && $nodes[$i]["id"]==$overrides[$u]["id"]) {
-					$node = $overrides[$u];
+					if (isset($overrides[$u]["newpath"])) $node["newpath"] = $overrides[$u]["newpath"];
+					if (isset($overrides[$u]["type"])) $node["type"] = $overrides[$u]["type"];
+					if (isset($overrides[$u]["newid"])) $node["newid"] = $overrides[$u]["newid"];
+					if (isset($overrides[$u]["del"])) $node["del"] = $overrides[$u]["del"];
+					if (isset($overrides[$u]["text"])) $node["text"] = $overrides[$u]["text"];
+					if (isset($overrides[$u]["position"])) $node["position"] = $overrides[$u]["position"];
+					if (isset($overrides[$u]["icon16"])) $node["icon16"] = $overrides[$u]["icon16"];
+					if (isset($overrides[$u]["iconSvg"])) $node["iconSvg"] = $overrides[$u]["iconSvg"];
+					if (isset($overrides[$u]["className"])) $node["className"] = $overrides[$u]["className"];
 					break;
 				}
 			}
