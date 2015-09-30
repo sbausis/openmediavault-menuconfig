@@ -45,8 +45,11 @@ case "$1" in
         chmod 0700 /usr/local/sbin/omv-menunodes
 
 		/usr/local/sbin/omv-menunodes -s admin -c
+		/usr/local/sbin/omv-menunodes -s admin -C
 		/usr/local/sbin/omv-menunodes -s user -c
+		/usr/local/sbin/omv-menunodes -s user -C
 		/usr/local/sbin/omv-menunodes -s public -c
+		/usr/local/sbin/omv-menunodes -s public -C
 
         chown root /usr/sbin/omv_menuconfig
         chmod 0700 /usr/sbin/omv_menuconfig

@@ -36,17 +36,11 @@ class OMVMenuconfigJson {
 	public $json_script = '/usr/local/sbin/omv-menunodes';
 	public $json_user = 'admin';
 	public $json_file = '/var/cache/openmediavault/cached_admin_nodes.json';
-	public $overrides_file = '/var/cache/openmediavault/cached_admin_overrides.json';
 	public function recache_nodes() {
 		$cmd_recache = $this->json_script . " -s " . $this->json_user . " -j -l -c > " . $this->json_file;
 		$output = system($cmd_recache, $ret);
 		if ($ret !== 0) {
 			throw new OMVException("failed to recache Nodes ...");
-		}
-		$cmd_recache = $this->json_script . " -s " . $this->json_user . " -j -L > " . $this->overrides_file;
-		$output = system($cmd_recache, $ret);
-		if ($ret !== 0) {
-			throw new OMVException("failed to recache Overrides ...");
 		}
 	}
 	public $json_string = NULL;
@@ -87,10 +81,18 @@ class OMVMenuconfigJson {
 		return $this->decode_nodes($this->load_nodes($recache));
 	}
 	
+	public $overrides_file = '/var/cache/openmediavault/cached_admin_overrides.json';
+	public function recache_overrides() {
+		$cmd_recache = $this->json_script . " -s " . $this->json_user . " -j -L -C > " . $this->overrides_file;
+		$output = system($cmd_recache, $ret);
+		if ($ret !== 0) {
+			throw new OMVException("failed to recache Overrides ...");
+		}
+	}
 	public $overrides_string = NULL;
 	public function load_overrides($force = FALSE) {
 		if (!file_exists($this->overrides_file) || $force === TRUE) {
-			$this->recache_nodes();
+			$this->recache_overrides();
 		}
 		$overrides_string = file_get_contents($this->overrides_file);
 		if($overrides_string === FALSE) {

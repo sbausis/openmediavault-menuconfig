@@ -41,10 +41,50 @@ Ext.define("OMV.module.admin.service.menuconfig.Nodes", {
         dataIndex : "path",
         stateId   : "path"
     },{
-        text      : _("enable"),
+        text      : _("del"),
         sortable  : true,
-        dataIndex : "enable",
-        stateId   : "enable"
+        dataIndex : "del",
+        stateId   : "del"
+    },{
+        text      : _("type"),
+        sortable  : true,
+        dataIndex : "type",
+        stateId   : "type"
+    },{
+        text      : _("text"),
+        sortable  : true,
+        dataIndex : "text",
+        stateId   : "text"
+    },{
+        text      : _("position"),
+        sortable  : true,
+        dataIndex : "position",
+        stateId   : "position"
+    },{
+        text      : _("icon16"),
+        sortable  : true,
+        dataIndex : "icon16",
+        stateId   : "icon16"
+    },{
+        text      : _("iconSvg"),
+        sortable  : true,
+        dataIndex : "iconSvg",
+        stateId   : "iconSvg"
+    },{
+        text      : _("className"),
+        sortable  : true,
+        dataIndex : "className",
+        stateId   : "className"
+    },{
+        text      : _("newpath"),
+        sortable  : true,
+        dataIndex : "newpath",
+        stateId   : "newpath"
+    },{
+        text      : _("newid"),
+        sortable  : true,
+        dataIndex : "newid",
+        stateId   : "newid"
     }],
 
     initComponent : function () {
@@ -55,10 +95,18 @@ Ext.define("OMV.module.admin.service.menuconfig.Nodes", {
                 model    : OMV.data.Model.createImplicit({
                     idProperty  : "fullpath",
                     fields      : [
+						{ name: "fullpath", type: "string" },
 						{ name: "id", type: "string" },
 						{ name: "path", type: "string" },
-						{ name: "fullpath", type: "string" },
-						{ name: "enable", type: "boolean" }
+						{ name: "del", type: "boolean" },
+						{ name: "type", type: "int" },
+						{ name: "text", type: "string" },
+						{ name: "position", type: "int" },
+						{ name: "icon16", type: "string" },
+						{ name: "iconSvg", type: "string" },
+						{ name: "className", type: "string" },
+						{ name: "newpath", type: "string" },
+						{ name: "newid", type: "string" }
                     ]
                 }),
                 proxy : {
