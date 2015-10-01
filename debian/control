@@ -9,5 +9,5 @@ Homepage: http://omv-extras.org/
 
 Package: openmediavault-menuconfig
 Architecture: all
-Depends: ${misc:Depends}, openmediavault (>= 2.1)
+Depends: ${misc:Depends}, nodejs, openmediavault (>= 2.1)
 Description: OpenMediaVault MenuConfig

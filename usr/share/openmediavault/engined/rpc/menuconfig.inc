@@ -34,10 +34,9 @@ require_once("openmediavault/notify.inc");
 
 class OMVMenuconfigJson {
 	public $json_script = '/usr/local/sbin/omv-menunodes';
-	public $json_user = 'admin';
-	public $json_file = '/var/cache/openmediavault/cached_admin_nodes.json';
+	public $json_file = '/var/cache/openmediavault/cached_all_nodes.json';
 	public function recache_nodes() {
-		$cmd_recache = $this->json_script . " -s " . $this->json_user . " -j -l -c > " . $this->json_file;
+		$cmd_recache = $this->json_script . " -c -C -A > " . $this->json_file;
 		$output = system($cmd_recache, $ret);
 		if ($ret !== 0) {
 			throw new OMVException("failed to recache Nodes ...");
@@ -81,7 +80,7 @@ class OMVMenuconfigJson {
 		return $this->decode_nodes($this->load_nodes($recache));
 	}
 	
-	public $overrides_file = '/var/cache/openmediavault/cached_admin_overrides.json';
+	public $overrides_file = '/var/cache/openmediavault/cached_all_overrides.json';
 	public function recache_overrides() {
 		$cmd_recache = $this->json_script . " -s " . $this->json_user . " -j -L -C > " . $this->overrides_file;
 		$output = system($cmd_recache, $ret);
@@ -342,9 +341,9 @@ class OMVRpcServiceMenuconfig extends OMVRpcServiceAbstract {
         //}');
 		
 		$json_handler = new OMVMenuconfigJson();
-		//$objects = $json_handler->get_nodes(false);
+		$objects = $json_handler->get_nodes(false);
 		//$objects = $json_handler->get_overrides(false);
-		$objects = $json_handler->get_list(false);
+		//$objects = $json_handler->get_list(false);
 		return $objects;
         // Filter the result.
         //return $this->applyFilter($objects, $params['start'],
