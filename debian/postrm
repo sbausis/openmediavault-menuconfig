@@ -24,31 +24,11 @@ set -e
 
 if [ "$1" = "purge" ]; then
 
-    if [ -f /var/cache/cached_admin_nodes.list ]; then
-        /bin/rm /var/cache/cached_admin_nodes.list
-    fi
-
-    if [ -f /var/cache/cached_admin_panels.list ]; then
-        /bin/rm /var/cache/cached_admin_panels.list
-    fi
-
-
-    if [ -f /var/cache/cached_user_nodes.list ]; then
-        /bin/rm /var/cache/cached_user_nodes.list
-    fi
-
-    if [ -f /var/cache/cached_user_panels.list ]; then
-        /bin/rm /var/cache/cached_user_panels.list
-    fi
-
-
-    if [ -f /var/cache/cached_public_nodes.list ]; then
-        /bin/rm /var/cache/cached_public_nodes.list
-    fi
-
-    if [ -f /var/cache/cached_public_panels.list ]; then
-        /bin/rm /var/cache/cached_public_panels.list
-    fi
+	FOLDER="/var/cache/openmediavault"
+	FILES="cached_module_nodes.json cached_module_override_nodes.json cached_module_override_panels.json cached_module_panels.json"
+	for FILE in ${FILES}; do
+		[ -f "${FOLDER}/${FILE}" ] && /bin/rm "${FOLDER}/${FILE}"
+	done
 
 fi
 

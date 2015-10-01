@@ -44,12 +44,7 @@ case "$1" in
         chown root /usr/local/sbin/omv-menunodes
         chmod 0700 /usr/local/sbin/omv-menunodes
 
-		/usr/local/sbin/omv-menunodes -s admin -j -l -c > /var/cache/openmediavault/cached_admin_nodes.json
-		/usr/local/sbin/omv-menunodes -s admin -j -L -C > /var/cache/openmediavault/cached_admin_overrides.json
-		/usr/local/sbin/omv-menunodes -s user -j -l -c > /var/cache/openmediavault/cached_user_nodes.json
-		/usr/local/sbin/omv-menunodes -s user -j -L -C > /var/cache/openmediavault/cached_user_overrides.json
-		/usr/local/sbin/omv-menunodes -s public -j -l -c > /var/cache/openmediavault/cached_public_nodes.json
-		/usr/local/sbin/omv-menunodes -s public -j -L -C > /var/cache/openmediavault/cached_public_overrides.json
+		/usr/local/sbin/omv-menunodes -c -C
 
         chown root /usr/sbin/omv_menuconfig
         chmod 0700 /usr/sbin/omv_menuconfig
