@@ -41,6 +41,8 @@ case "$1" in
 			omv_config_add_element "${SERVICE_XPATH}" "entries" ""
         fi
 
+		ln -sf /usr/bin/nodejs /usr/local/sbin/node
+		
         chown root /usr/local/sbin/omv-menunodes
         chmod 0700 /usr/local/sbin/omv-menunodes
 
