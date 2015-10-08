@@ -60,7 +60,7 @@ class OMVMenuconfigJson {
 		if($json_data === NULL) {
 			throw new RuntimeException("failed to decode JSON Data : " . $this->json_file . " ...");
 		}
-		$objects = array();
+		/*$objects = array();
 		for ($i = 0; $i < count($json_data); $i++) {
 			$fullpath = (strlen($json_data[$i]["path"])>1)
 				?$json_data[$i]["path"]."/".$json_data[$i]["id"]
@@ -72,9 +72,9 @@ class OMVMenuconfigJson {
 						"fullpath" 	=> $fullpath,
 						"enable" 	=> boolval($enable),
 			));
-		}
+		}*/
 		$this->json_object = $json_data;
-		return $objects;
+		return $json_data;
 	}
 	public function get_nodes($recache = FALSE) {
 		return $this->decode_nodes($this->load_nodes($recache));
